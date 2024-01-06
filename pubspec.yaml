@@ -13,7 +13,9 @@ dependencies:
   linked_scroll_controller: ^0.2.0
   highlight: ^0.7.0
   flutter_highlight:
-    path: ../highlight.dart/flutter_highlight
+    git:
+      url: "https://github.com/TENX-S/highlight.dart.git"
+      path: "./flutter_highlight"
   fluent_ui: ^4.8.3
 
 dev_dependencies:
