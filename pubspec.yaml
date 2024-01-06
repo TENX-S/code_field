@@ -12,7 +12,9 @@ dependencies:
     sdk: flutter
   linked_scroll_controller: ^0.2.0
   highlight: ^0.7.0
-  flutter_highlight: ^0.7.0
+  flutter_highlight:
+    path: ../highlight.dart/flutter_highlight
+  fluent_ui: ^4.8.3
 
 dev_dependencies:
   flutter_test:

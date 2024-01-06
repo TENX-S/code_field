@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:highlight/highlight.dart';
 import '../../code_text_field.dart';
 
@@ -180,7 +180,7 @@ class CodeAutoComplete<T> {
     return Positioned(
         top: offset.dy,
         left: offset.dx,
-        child: Material(
+        child: Mica(
           elevation: 8,
           child: StatefulBuilder(builder: (context, setState) {
             panelSetState = setState;

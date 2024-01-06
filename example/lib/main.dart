@@ -98,8 +98,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           TextButton.icon(
             style: TextButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 8.0),
-              primary: Colors.white,
+              foregroundColor: Colors.white, padding: EdgeInsets.symmetric(horizontal: 8.0),
             ),
             icon: Icon(FontAwesomeIcons.github),
             onPressed: () =>

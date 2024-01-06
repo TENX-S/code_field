@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
+// import 'package:flutter/material.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
 import '../code_theme/code_theme.dart';
@@ -14,7 +15,7 @@ class CodeField extends StatefulWidget {
   /// {@macro flutter.widgets.textField.smartQuotesType}
   final SmartQuotesType? smartQuotesType;
 
-/// {@macro flutter.widgets.textField.smartDashesType}
+  /// {@macro flutter.widgets.textField.smartDashesType}
   final SmartDashesType? smartDashesType;
 
   /// {@macro flutter.widgets.textField.keyboardType}
@@ -36,7 +37,7 @@ class CodeField extends StatefulWidget {
   final CodeController controller;
 
   /// A LineNumberStyle instance to tweak the line number column styling
-  final LineNumberStyle lineNumberStyle;
+  LineNumberStyle lineNumberStyle;
 
   /// {@macro flutter.widgets.textField.cursorColor}
   final Color? cursorColor;
@@ -74,7 +75,7 @@ class CodeField extends StatefulWidget {
   final TextStyle? hintStyle;
   final CodeAutoComplete? autoComplete;
 
-  const CodeField({
+  CodeField({
     Key? key,
     required this.controller,
     this.minLines,
@@ -175,11 +176,16 @@ class _CodeFieldState extends State<CodeField> {
     final str = widget.controller.text.split('\n');
     final buf = <String>[];
 
-    for (var k = 0; k < str.length; k++) {
+    var k = 0;
+    for (; k < str.length; k++) {
       buf.add((k + 1).toString());
     }
 
     _numberController?.text = buf.join('\n');
+
+    widget.lineNumberStyle = LineNumberStyle(
+      width: 42 + (k > 9 ? (buf.last.length - 1) * 10 : 0),
+    );
 
     // Find longest line
     longestLine = '';
@@ -243,8 +249,8 @@ class _CodeFieldState extends State<CodeField> {
   Widget build(BuildContext context) {
     // Default color scheme
     const rootKey = 'root';
-    final defaultBg = Colors.grey.shade900;
-    final defaultText = Colors.grey.shade200;
+    const defaultBg = Colors.black;
+    final defaultText = Colors.grey[50];
 
     final styles = CodeTheme.of(context)?.styles;
     Color? backgroundCol =
@@ -275,27 +281,31 @@ class _CodeFieldState extends State<CodeField> {
     final cursorColor =
         widget.cursorColor ?? styles?[rootKey]?.color ?? defaultText;
 
-    TextField? lineNumberCol;
+    Widget? lineNumberCol;
     Container? numberCol;
 
     if (widget.lineNumbers) {
-      lineNumberCol = TextField(
-        smartQuotesType: widget.smartQuotesType,
-        smartDashesType: widget.smartDashesType,
-        scrollPadding: widget.padding,
-        style: numberTextStyle,
-        controller: _numberController,
-        enabled: false,
-        minLines: widget.minLines,
-        maxLines: widget.maxLines,
-        selectionControls: widget.selectionControls,
-        expands: widget.expands,
-        scrollController: _numberScroll,
-        decoration: InputDecoration(
-          disabledBorder: InputBorder.none,
-          isDense: widget.isDense,
+      lineNumberCol = ScrollConfiguration(
+        behavior: HideScrollbarBehavior(),
+        child: TextBox(
+          smartQuotesType: widget.smartQuotesType,
+          smartDashesType: widget.smartDashesType,
+          scrollPadding: widget.padding,
+          style: numberTextStyle,
+          controller: _numberController,
+          enabled: false,
+          minLines: widget.minLines,
+          maxLines: widget.maxLines,
+          selectionControls: widget.selectionControls,
+          expands: widget.expands,
+          scrollController: _numberScroll,
+          decoration: BoxDecoration(
+            color: backgroundCol,
+            // disabledBorder: InputBorder.none,
+            // isDense: widget.isDense,
+          ),
+          textAlign: widget.lineNumberStyle.textAlign,
         ),
-        textAlign: widget.lineNumberStyle.textAlign,
       );
 
       numberCol = Container(
@@ -309,7 +319,7 @@ class _CodeFieldState extends State<CodeField> {
       );
     }
 
-    final codeField = TextField(
+    final codeField = TextBox(
       keyboardType: widget.keyboardType,
       smartQuotesType: widget.smartQuotesType,
       smartDashesType: widget.smartDashesType,
@@ -326,17 +336,20 @@ class _CodeFieldState extends State<CodeField> {
       maxLines: widget.maxLines,
       expands: widget.expands,
       scrollController: _codeScroll,
-      decoration: InputDecoration(
-        disabledBorder: InputBorder.none,
-        border: InputBorder.none,
-        focusedBorder: InputBorder.none,
-        isDense: widget.isDense,
-        hintText: widget.hintText,
-        hintStyle: widget.hintStyle,
+      highlightColor: Colors.transparent,
+      decoration: BoxDecoration(
+        color: backgroundCol,
+        // disabledBorder: InputBorder.none,
+        // border: InputBorder.none,
+        // focusedBorder: InputBorder.none,
+        // isDense: widget.isDense,
+        // hintText: widget.hintText,
+        // hintStyle: widget.hintStyle,
       ),
       onTapOutside: (e) {
         Future.delayed(const Duration(milliseconds: 300), hideAutoComplete);
       },
+      clipBehavior: Clip.antiAlias,
       cursorColor: cursorColor,
       autocorrect: false,
       enableSuggestions: false,
@@ -348,9 +361,10 @@ class _CodeFieldState extends State<CodeField> {
       readOnly: widget.readOnly,
     );
 
-    final codeCol = Theme(
-      data: Theme.of(context).copyWith(
-        textSelectionTheme: widget.textSelectionTheme,
+    final codeCol = FluentTheme(
+      data: FluentTheme.of(context).copyWith(
+        selectionColor: widget.textSelectionTheme?.selectionColor,
+        // textSelectionTheme: widget.textSelectionTheme,
       ),
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
@@ -374,5 +388,16 @@ class _CodeFieldState extends State<CodeField> {
         ],
       ),
     );
+  }
+}
+
+class HideScrollbarBehavior extends ScrollBehavior {
+  @override
+  Widget buildScrollbar(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    return child;
   }
 }
